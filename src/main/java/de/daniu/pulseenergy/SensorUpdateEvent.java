@@ -1,6 +1,5 @@
 package de.daniu.pulseenergy;
 
-import de.daniu.pulseenergy.sensors.PulseSensor;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 

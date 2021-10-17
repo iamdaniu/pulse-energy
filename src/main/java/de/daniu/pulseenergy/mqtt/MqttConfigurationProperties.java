@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties("mqtt")
-public class MqttConfigurationProperties {
+class MqttConfigurationProperties {
     private String publisher;
 
     private String host;

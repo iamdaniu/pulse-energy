@@ -1,9 +1,13 @@
 package de.daniu.pulseenergy.homeassistant;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
 class EntityDefinition {
     private String name;
     private DeviceDefinition device;

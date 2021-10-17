@@ -2,31 +2,28 @@ package de.daniu.pulseenergy.homeassistant;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.daniu.pulseenergy.SensorConfigurationProperties;
+import de.daniu.pulseenergy.SensorService;
 import de.daniu.pulseenergy.SensorUpdateEvent;
 import de.daniu.pulseenergy.mqtt.MqttService;
-import de.daniu.pulseenergy.PulseSensorConfigurationProperties;
-import de.daniu.pulseenergy.sensors.PulseSensor;
+import de.daniu.pulseenergy.PulseSensor;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 
 @Service
-public class EntityService implements ApplicationListener<SensorUpdateEvent> {
+class EntityService implements ApplicationListener<SensorUpdateEvent> {
     private final MqttService mqttService;
     private ObjectMapper mapper = new ObjectMapper();
 
     public EntityService(MqttService mqttService,
                          HomeAssistantConfigurationProperties properties,
-                         PulseSensorConfigurationProperties sensorConfigurations) {
+                         SensorService sensorService) {
         this.mqttService = mqttService;
 
         DiscoverySender discoverySender = new DiscoverySender(properties);
-        sensorConfigurations.getSensors().forEach(discoverySender::sendDiscovery);
+        sensorService.getAllSensors().forEach(discoverySender::sendDiscovery);
     }
 
     @Override
@@ -44,9 +41,9 @@ public class EntityService implements ApplicationListener<SensorUpdateEvent> {
     class DiscoverySender {
         private final HomeAssistantConfigurationProperties properties;
 
-        private void sendDiscovery(SensorConfigurationProperties sensorConfigurationProperties) {
-            List<EntityDefinition> entityDefinitions = Entities.forSensorConfiguration(sensorConfigurationProperties);
-            entityDefinitions.forEach(this::sendDiscovery);
+        private void sendDiscovery(PulseSensor sensor) {
+            Entities.entitiesForSensor(sensor.getName())
+                    .forEach(this::sendDiscovery);
         }
 
         private void sendDiscovery(EntityDefinition entityDefinition) {

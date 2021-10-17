@@ -1,17 +1,16 @@
 package de.daniu.pulseenergy.homeassistant;
 
-import de.daniu.pulseenergy.SensorConfigurationProperties;
 
-import java.util.List;
+import java.util.stream.Stream;
 
-public class Entities {
+class Entities {
     private static final DeviceDefinition DEVICE = new DeviceDefinition("pulse_energy_meter", "daniu", "47f8e41c-bfb3-4e5c-b383-515eb0f073da");
 
-    static List<EntityDefinition> forSensorConfiguration(SensorConfigurationProperties sensorConfiguration) {
-        return List.of(
-                currentUsageEntity(sensorConfiguration),
-                totalUsageEntity(sensorConfiguration),
-                usageCounterReadout(sensorConfiguration)
+    static Stream<EntityDefinition> entitiesForSensor(String name) {
+        return Stream.of(
+                currentUsageEntity(name),
+                totalUsageEntity(name),
+                usageCounterReadout(name)
         );
     }
 
@@ -19,46 +18,42 @@ public class Entities {
         return "energy/" + sensorname.toLowerCase();
     }
 
-    private static EntityDefinition currentUsageEntity(SensorConfigurationProperties sensorConfiguration) {
+    private static EntityDefinition currentUsageEntity(String name) {
         EntityDefinition result = new EntityDefinition();
         result.setDevice_class("power");
         result.setUnit_of_measurement("W");
         result.setIcon("mdi:power");
-        String lowercaseName = sensorConfiguration.getName().toLowerCase();
-        result.setState_topic(topicFromSensorname(sensorConfiguration.getName()));
+        result.setState_topic(topicFromSensorname(name));
         result.setValue_template("{{ value_json.currentUsage }}");
 
-        result.setName(sensorConfiguration.getName() + " Current Usage");
-        result.setUnique_id(String.format("%s-%s-CU", DEVICE.getIds(), sensorConfiguration.getName()));
+        result.setName(name + " Current Usage");
+        result.setUnique_id(String.format("%s-%s-CU", DEVICE.getIds(), name));
         result.setDevice(DEVICE);
         return result;
     }
-    private static EntityDefinition totalUsageEntity(SensorConfigurationProperties sensorConfiguration) {
-        EntityDefinition result = new EntityDefinition();
-        result.setDevice_class("energy");
-        result.setUnit_of_measurement("kWh");
-        result.setIcon("mdi:energy");
-        String lowercaseName = sensorConfiguration.getName().toLowerCase();
-        result.setState_topic(topicFromSensorname(sensorConfiguration.getName()));
-        result.setValue_template("{{ value_json.totalUsage }}");
 
-        result.setName(sensorConfiguration.getName() + " Total Usage");
-        result.setUnique_id(String.format("%s-%s-TU", DEVICE.getIds(), sensorConfiguration.getName()));
-        result.setDevice(DEVICE);
-        return result;
+    private static EntityDefinition totalUsageEntity(String name) {
+        return usageBuilder()
+                .value_template("{{ value_json.totalUsage }}")
+                .name(name + " Total Usage")
+                .unique_id(String.format("%s-%s-TU", DEVICE.getIds(), name))
+                .state_topic(topicFromSensorname(name))
+                .build();
     }
-    private static EntityDefinition usageCounterReadout(SensorConfigurationProperties sensorConfiguration) {
-        EntityDefinition result = new EntityDefinition();
-        result.setDevice_class("energy");
-        result.setUnit_of_measurement("kWh");
-        result.setIcon("mdi:energy");
-        String lowercaseName = sensorConfiguration.getName().toLowerCase();
-        result.setState_topic(topicFromSensorname(sensorConfiguration.getName()));
-        result.setValue_template("{{ value_json.counter }}");
+    private static EntityDefinition usageCounterReadout(String name) {
+        return usageBuilder()
+                .value_template("{{ value_json.counter }}")
+                .name(name + " Meter")
+                .unique_id(String.format("%s-%s-CR", DEVICE.getIds(), name))
+                .state_topic(topicFromSensorname(name))
+                .build();
+    }
 
-        result.setName(sensorConfiguration.getName() + " Meter");
-        result.setUnique_id(String.format("%s-%s-CR", DEVICE.getIds(), sensorConfiguration.getName()));
-        result.setDevice(DEVICE);
-        return result;
+    private static EntityDefinition.EntityDefinitionBuilder usageBuilder() {
+        return new EntityDefinition.EntityDefinitionBuilder()
+                .device_class("energy")
+                .unit_of_measurement("kWh")
+                .icon("mdi:energy")
+                .device(DEVICE);
     }
 }

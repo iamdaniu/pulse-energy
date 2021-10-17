@@ -1,6 +1,6 @@
 package de.daniu.pulseenergy.sensors;
 
-import de.daniu.pulseenergy.PulseSensorConfigurationProperties;
+import de.daniu.pulseenergy.PulseSensor;
 import de.daniu.pulseenergy.SensorService;
 import de.daniu.pulseenergy.SensorUpdateEvent;
 import org.springframework.context.ApplicationEventPublisher;
@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class SensorServiceImpl implements SensorService {
+class SensorServiceImpl implements SensorService {
     private final Map<String, PulseSensor> sensors;
     private final ApplicationEventPublisher applicationEventPublisher;
 

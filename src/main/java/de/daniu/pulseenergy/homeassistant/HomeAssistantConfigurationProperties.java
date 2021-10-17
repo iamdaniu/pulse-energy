@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties("homeassistant")
-public class HomeAssistantConfigurationProperties {
+class HomeAssistantConfigurationProperties {
     private String deviceUuid;
     private String component;
     private DiscoveryConfigurationProperties discovery;

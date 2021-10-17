@@ -1,4 +1,4 @@
-package de.daniu.pulseenergy.sensors;
+package de.daniu.pulseenergy;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
