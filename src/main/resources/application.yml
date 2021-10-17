@@ -1,0 +1,20 @@
+
+mqtt:
+  host: rhas
+  port: 1883
+  publisher: pulse-sensors
+  user: hass
+
+homeassistant:
+  device-uuid: 47f8e41c-bfb3-4e5c-b383-515eb0f073da
+  discovery:
+    prefix: homeassistant
+  component: sensor
+
+sensors:
+  - name: Hausstrom
+    pulses-per-kwh: 6400
+    guid: dbfb786d-3167-439e-9481-db3ada3a9109
+  - name: Heizstrom
+    pulses-per-kwh: 500
+    guid: ef974bc8-e7f2-4037-8e4b-9f5ee0f063d0
