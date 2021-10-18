@@ -7,6 +7,5 @@ public interface SensorService {
 
     Collection<PulseSensor> getAllSensors();
 
-    void setSensorCounter(String sensorId, double counter);
-
+    void setSensorCounter(String sensorId, String counterId, double counter);
 }

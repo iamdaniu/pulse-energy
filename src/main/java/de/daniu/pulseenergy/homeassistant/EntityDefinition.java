@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@AllArgsConstructor
 @NoArgsConstructor
 class EntityDefinition {
     private String name;
@@ -21,6 +22,7 @@ class EntityDefinition {
     private String unit_of_measurement;
 }
 
+@NoArgsConstructor
 @AllArgsConstructor
 @Data
 class DeviceDefinition {

@@ -42,7 +42,7 @@ class EntityService implements ApplicationListener<SensorUpdateEvent> {
         private final HomeAssistantConfigurationProperties properties;
 
         private void sendDiscovery(PulseSensor sensor) {
-            Entities.entitiesForSensor(sensor.getName())
+            Entities.entitiesForSensor(sensor)
                     .forEach(this::sendDiscovery);
         }
 

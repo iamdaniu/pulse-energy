@@ -28,8 +28,10 @@ public class SensorController {
         sensorService.countImpulse(sensorId);
     }
 
-    @PutMapping(path = "sensor/{sensorId}/counter")
-    public void setSensorCounter(@PathVariable String sensorId, @RequestBody double counter) {
-        sensorService.setSensorCounter(sensorId, counter);
+    @PutMapping(path = "sensor/{sensorId}/counter/{counterId}")
+    public void setSensorCounter(@PathVariable String sensorId,
+                                 @PathVariable String counterId,
+                                 @RequestBody double counter) {
+        sensorService.setSensorCounter(sensorId, counterId, counter);
     }
 }

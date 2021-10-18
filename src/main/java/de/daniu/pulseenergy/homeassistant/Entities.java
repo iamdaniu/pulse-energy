@@ -1,17 +1,22 @@
 package de.daniu.pulseenergy.homeassistant;
 
 
+import de.daniu.pulseenergy.PulseSensor;
+
 import java.util.stream.Stream;
 
 class Entities {
     private static final DeviceDefinition DEVICE = new DeviceDefinition("pulse_energy_meter", "daniu", "47f8e41c-bfb3-4e5c-b383-515eb0f073da");
 
-    static Stream<EntityDefinition> entitiesForSensor(String name) {
-        return Stream.of(
-                currentUsageEntity(name),
-                totalUsageEntity(name),
-                usageCounterReadout(name)
-        );
+    static Stream<EntityDefinition> entitiesForSensor(PulseSensor sensor) {
+        String name = sensor.getName();
+        return Stream.concat(
+                Stream.of(
+                        currentUsageEntity(name),
+                        totalUsageEntity(name)
+                ),
+                sensor.getCounters().values().stream()
+                        .map(c -> counterReadout(name, c)));
     }
 
     static String topicFromSensorname(String sensorname) {
@@ -19,33 +24,37 @@ class Entities {
     }
 
     private static EntityDefinition currentUsageEntity(String name) {
-        EntityDefinition result = new EntityDefinition();
-        result.setDevice_class("power");
-        result.setUnit_of_measurement("W");
-        result.setIcon("mdi:power");
-        result.setState_topic(topicFromSensorname(name));
-        result.setValue_template("{{ value_json.currentUsage }}");
+        return new EntityDefinition.EntityDefinitionBuilder()
+                .name(name + " Current Usage")
+                .unique_id(String.format("%s-%s-CU", DEVICE.getIds(), name))
+                .device_class("power")
+                .unit_of_measurement("W")
+                .icon("mdi:power-plug")
+                .state_topic(topicFromSensorname(name))
+                .value_template("{{ value_json.currentUsage }}")
 
-        result.setName(name + " Current Usage");
-        result.setUnique_id(String.format("%s-%s-CU", DEVICE.getIds(), name));
-        result.setDevice(DEVICE);
-        return result;
+                .device(DEVICE)
+                .build();
     }
 
     private static EntityDefinition totalUsageEntity(String name) {
         return usageBuilder()
                 .value_template("{{ value_json.totalUsage }}")
                 .name(name + " Total Usage")
-                .unique_id(String.format("%s-%s-TU", DEVICE.getIds(), name))
+                .unique_id(String.format("%s-%s-TU", DEVICE.getIds(), name.toLowerCase()))
                 .state_topic(topicFromSensorname(name))
+                .icon("mdi:transmission-tower")
                 .build();
     }
-    private static EntityDefinition usageCounterReadout(String name) {
+
+    private static EntityDefinition counterReadout(String sensorName, PulseSensor.EnergyCounter energyCounter) {
+        String counterName = energyCounter.getName();
         return usageBuilder()
-                .value_template("{{ value_json.counter }}")
-                .name(name + " Meter")
-                .unique_id(String.format("%s-%s-CR", DEVICE.getIds(), name))
-                .state_topic(topicFromSensorname(name))
+                .value_template(String.format("{{ value_json.counters.%s.reading }}", counterName.toLowerCase()))
+                .name(sensorName + " " + counterName + " Meter")
+                .unique_id(String.format("%s-%s-%s", DEVICE.getIds(), sensorName.toLowerCase(), counterName.toLowerCase()))
+                .state_topic(topicFromSensorname(sensorName))
+                .icon("mdi:counter")
                 .build();
     }
 
@@ -53,7 +62,6 @@ class Entities {
         return new EntityDefinition.EntityDefinitionBuilder()
                 .device_class("energy")
                 .unit_of_measurement("kWh")
-                .icon("mdi:energy")
                 .device(DEVICE);
     }
 }

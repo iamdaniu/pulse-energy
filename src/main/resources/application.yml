@@ -1,6 +1,6 @@
 
 mqtt:
-  host: rhas
+  host: 192.168.1.1
   port: 1883
   publisher: pulse-sensors
   user: hass
@@ -15,6 +15,15 @@ sensors:
   - name: Hausstrom
     pulses-per-kwh: 6400
     guid: dbfb786d-3167-439e-9481-db3ada3a9109
+    counters:
+      - name: main
   - name: Heizstrom
     pulses-per-kwh: 500
     guid: ef974bc8-e7f2-4037-8e4b-9f5ee0f063d0
+    counters:
+      - name: T1
+        from: 7
+        to: 20
+      - name: T2
+        from: 20
+        to: 7

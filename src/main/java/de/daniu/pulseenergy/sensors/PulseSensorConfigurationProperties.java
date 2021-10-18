@@ -11,7 +11,6 @@ import java.util.List;
 @ConfigurationProperties
 class PulseSensorConfigurationProperties {
     private List<SensorConfigurationProperties> sensors;
-
 }
 
 @Data
@@ -19,4 +18,12 @@ class SensorConfigurationProperties {
     private String name;
     private double pulsesPerKwh;
     private String guid;
+    private List<EnergyCounterConfigurationProperties> counters;
+}
+
+@Data
+class EnergyCounterConfigurationProperties {
+    private String name;
+    private int from;
+    private int to;
 }

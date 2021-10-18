@@ -10,7 +10,9 @@ import javax.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 class SensorServiceImpl implements SensorService {
@@ -21,8 +23,8 @@ class SensorServiceImpl implements SensorService {
         this.applicationEventPublisher = applicationEventPublisher;
         sensors = new HashMap<>();
         properties.getSensors().stream()
-                .map(p -> new PulseSensor(p.getName().toLowerCase(), p.getPulsesPerKwh()))
-                .forEach(s -> sensors.put(s.getName(), s));
+                .map(SensorServiceImpl::createFromProperties)
+                .forEach(s -> sensors.put(s.getName().toLowerCase(), s));
     }
 
     @Override
@@ -38,14 +40,25 @@ class SensorServiceImpl implements SensorService {
     }
 
     @Override
-    public void setSensorCounter(String sensorId, double counter) {
+    public void setSensorCounter(String sensorId, String counterId, double counter) {
         PulseSensor sensor = sensors.get(sensorId.toLowerCase());
-        sensor.setCounterBase(counter);
+        sensor.setCounterBase(counterId, counter);
         applicationEventPublisher.publishEvent(new SensorUpdateEvent(this, sensor));
     }
 
     @PostConstruct
     public void dump() {
         sensors.forEach((k, v) -> System.out.printf("%s: %s%n", k, v));
+    }
+
+    private static PulseSensor createFromProperties(SensorConfigurationProperties properties) {
+        PulseSensor result = new PulseSensor(properties.getName(), properties.getPulsesPerKwh());
+        if (properties.getCounters() != null) {
+            List<PulseSensor.EnergyCounter> counters = properties.getCounters().stream()
+                    .map(p -> new PulseSensor.EnergyCounter(p.getName(), p.getFrom(), p.getTo()))
+                    .collect(Collectors.toList());
+            result.setCounters(counters);
+        }
+        return result;
     }
 }
