@@ -1,5 +1,7 @@
 package de.daniu.pulseenergy;
 
+import de.daniu.pulseenergy.domain.PulseSensor;
+
 import java.util.Collection;
 
 public interface SensorService {

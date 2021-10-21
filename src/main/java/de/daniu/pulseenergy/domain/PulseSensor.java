@@ -1,5 +1,6 @@
-package de.daniu.pulseenergy;
+package de.daniu.pulseenergy.domain;
 
+import de.daniu.pulseenergy.sensors.CounterDecider;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -7,7 +8,6 @@ import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 public class PulseSensor {
     private static final double SECONDS_PER_HOUR = 60 * 60;
 
+    private final CounterDecider counterDecider;
     @Getter
     private final String name;
     private final double pulsesPerKWh;
@@ -38,12 +39,8 @@ public class PulseSensor {
         totalPulses++;
 
         LocalDateTime localDateTime = LocalDateTime.ofInstant(pulseTime, ZoneId.systemDefault());
-        int hour = localDateTime.get(ChronoField.HOUR_OF_DAY);
-        for (EnergyCounter counter : counters.values()) {
-            if (counter.validFor(hour)) {
-                counter.increase(1d / pulsesPerKWh);
-            }
-        }
+        counterDecider.findValid(counters.values(), localDateTime)
+                .ifPresent(c -> c.increase(1d / pulsesPerKWh));
     }
 
     // in watts
@@ -80,43 +77,5 @@ public class PulseSensor {
         return new BigDecimal(toRound).setScale(digits, RoundingMode.HALF_UP).doubleValue();
     }
 
-    public static class EnergyCounter {
-        @Getter
-        @Setter
-        private String name;
-        private final int from;
-        private final int to;
-
-        @Setter
-        private double reading;
-
-        public EnergyCounter(String main) {
-            this(main, 0, 24);
-        }
-        public EnergyCounter(String name, int from, int to) {
-            this.name = name;
-            this.from = from;
-            this.to = to;
-            reading = 0;
-        }
-
-        @SuppressWarnings("unused")
-        public double getReading() {
-            return PulseSensor.round(reading, 1);
-        }
-
-        public boolean validFor(int hourOfDay) {
-            boolean result;
-            if (from < to) {
-                result = from <= hourOfDay && hourOfDay < to;
-            } else {
-                result = hourOfDay <= to || hourOfDay >= from;
-            }
-            return result;
-        }
-        public void increase(double v) {
-            reading += v;
-        }
-    }
 }
 

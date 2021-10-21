@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.daniu.pulseenergy.SensorService;
 import de.daniu.pulseenergy.SensorUpdateEvent;
 import de.daniu.pulseenergy.mqtt.MqttService;
-import de.daniu.pulseenergy.PulseSensor;
+import de.daniu.pulseenergy.domain.PulseSensor;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.context.ApplicationListener;
@@ -38,7 +38,7 @@ class EntityService implements ApplicationListener<SensorUpdateEvent> {
     }
 
     @RequiredArgsConstructor
-    class DiscoverySender {
+    private class DiscoverySender {
         private final HomeAssistantConfigurationProperties properties;
 
         private void sendDiscovery(PulseSensor sensor) {

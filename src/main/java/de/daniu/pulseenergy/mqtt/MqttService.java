@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MqttService {
-    IMqttClient client;
+    private IMqttClient client;
     public MqttService(MqttConfigurationProperties properties) throws MqttException {
         String uri = String.format("tcp://%s:%d", properties.getHost(), properties.getPort());
         client = new MqttClient(uri, properties.getPublisher());

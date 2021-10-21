@@ -22,8 +22,21 @@ sensors:
     guid: ef974bc8-e7f2-4037-8e4b-9f5ee0f063d0
     counters:
       - name: T1
-        from: 7
-        to: 20
+        type: day
       - name: T2
-        from: 20
-        to: 7
+
+times:
+  summer:
+    start:
+      day: 1
+      month: 4
+    day:
+      from: 7
+      to: 20
+  winter:
+    start:
+      day: 1
+      month: 10
+    day:
+      from: 7
+      to: 21

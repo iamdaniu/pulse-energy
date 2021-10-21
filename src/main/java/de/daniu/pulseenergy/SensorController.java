@@ -1,5 +1,6 @@
 package de.daniu.pulseenergy;
 
+import de.daniu.pulseenergy.domain.PulseSensor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

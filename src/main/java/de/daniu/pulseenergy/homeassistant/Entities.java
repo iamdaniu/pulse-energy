@@ -1,7 +1,8 @@
 package de.daniu.pulseenergy.homeassistant;
 
 
-import de.daniu.pulseenergy.PulseSensor;
+import de.daniu.pulseenergy.domain.EnergyCounter;
+import de.daniu.pulseenergy.domain.PulseSensor;
 
 import java.util.stream.Stream;
 
@@ -47,7 +48,7 @@ class Entities {
                 .build();
     }
 
-    private static EntityDefinition counterReadout(String sensorName, PulseSensor.EnergyCounter energyCounter) {
+    private static EntityDefinition counterReadout(String sensorName, EnergyCounter energyCounter) {
         String counterName = energyCounter.getName();
         return usageBuilder()
                 .value_template(String.format("{{ value_json.counters.%s.reading }}", counterName.toLowerCase()))
