@@ -2,6 +2,7 @@ package de.daniu.pulseenergy.domain;
 
 import de.daniu.pulseenergy.sensors.CounterDecider;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @ToString
 @RequiredArgsConstructor
 public class PulseSensor {
@@ -33,7 +35,12 @@ public class PulseSensor {
 
     public void pulse(Instant pulseTime) {
         if (lastPulse != null) {
-            secondsBetweenLastPulses = (double) lastPulse.until(pulseTime, ChronoUnit.MILLIS) / 1_000d;
+            long millisSinceLastPulse = lastPulse.until(pulseTime, ChronoUnit.MILLIS);
+            if (millisSinceLastPulse < 200) {
+                log.warn("Time since last pulse too short ({} ms), dropping current impulse", millisSinceLastPulse);
+                return;
+            }
+            secondsBetweenLastPulses = (double) millisSinceLastPulse / 1_000d;
         }
         lastPulse = pulseTime;
         totalPulses++;
