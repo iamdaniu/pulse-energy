@@ -1,7 +1,5 @@
-package de.daniu.pulseenergy.sensors;
+package de.daniu.pulseenergy.domain;
 
-import de.daniu.pulseenergy.domain.CounterType;
-import de.daniu.pulseenergy.domain.EnergyCounter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,10 +28,6 @@ class CounterDeciderTest {
 
     @InjectMocks
     private CounterDecider sut;
-
-    @BeforeEach
-    void setup() {
-    }
 
     @Test
     void givesDayRange() {

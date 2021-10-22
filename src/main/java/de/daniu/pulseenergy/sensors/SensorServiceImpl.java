@@ -1,5 +1,6 @@
 package de.daniu.pulseenergy.sensors;
 
+import de.daniu.pulseenergy.domain.CounterDecider;
 import de.daniu.pulseenergy.domain.EnergyCounter;
 import de.daniu.pulseenergy.domain.PulseSensor;
 import de.daniu.pulseenergy.SensorService;

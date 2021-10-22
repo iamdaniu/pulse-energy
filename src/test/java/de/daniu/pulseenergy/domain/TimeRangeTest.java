@@ -1,4 +1,4 @@
-package de.daniu.pulseenergy.sensors;
+package de.daniu.pulseenergy.domain;
 
 
 import org.junit.jupiter.params.ParameterizedTest;

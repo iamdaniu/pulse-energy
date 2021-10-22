@@ -1,7 +1,5 @@
-package de.daniu.pulseenergy.sensors;
+package de.daniu.pulseenergy.domain;
 
-import de.daniu.pulseenergy.domain.CounterType;
-import de.daniu.pulseenergy.domain.EnergyCounter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -58,51 +56,3 @@ class SummerDecider {
     }
 }
 
-@ConfigurationProperties(prefix = "times")
-@Component
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-class TimeConfigurationProperties {
-    private SeasonConfiguration summer;
-    private SeasonConfiguration winter;
-}
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-class SeasonConfiguration {
-    private StartDate start;
-    private TimeRange day;
-}
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-class StartDate {
-    private int day;
-    private int month;
-
-    LocalDate forYear(int year) {
-        return LocalDate.of(year, month, day);
-    }
-}
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-class TimeRange {
-    private int from;
-    private int to;
-
-    boolean inRange(LocalDateTime time) {
-        boolean result;
-        int hourOfDay = time.getHour();
-        if (from < to) {
-            result = from <= hourOfDay && hourOfDay < to;
-        } else {
-            result = hourOfDay < to || hourOfDay >= from;
-        }
-        return result;
-    }
-}
