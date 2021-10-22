@@ -24,6 +24,17 @@ class UsageCalculatorTest {
         LocalTime secondPulse = LocalTime.of(13, 0, 30);
         long millis = firstPulse.until(secondPulse, ChronoUnit.MILLIS);
 
-        assertThat(sut.getUsage(millis)).isEqualTo(2_000);
+        assertThat(sut.getUsage(millis / 1_000d)).isEqualTo(2_000);
+    }
+    @Test
+    void usageBetweenPulsesFromWebsiteExample() {
+        sut = new UsageCalculator(1000);
+
+        // pulse half a minute apart
+        LocalTime firstPulse = LocalTime.of(13, 0, 0, 0);
+        LocalTime secondPulse = firstPulse.plusSeconds(169);
+        long millis = firstPulse.until(secondPulse, ChronoUnit.MILLIS);
+
+        assertThat(sut.getUsage(millis / 1_000d)).isEqualTo(21);
     }
 }
