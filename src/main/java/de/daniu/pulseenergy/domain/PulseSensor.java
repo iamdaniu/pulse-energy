@@ -18,14 +18,11 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @ToString
-@RequiredArgsConstructor
 public class PulseSensor {
-    private static final double SECONDS_PER_HOUR = 60 * 60;
-
     private final CounterDecider counterDecider;
     @Getter
     private final String name;
-    private final double pulsesPerKWh;
+    private final UsageCalculator usageCalculator;
 
     private long totalPulses;
     private Instant lastPulse;
@@ -33,38 +30,39 @@ public class PulseSensor {
 
     private Map<String, EnergyCounter> counters = Map.of("main", new EnergyCounter("main"));
 
+    public PulseSensor(CounterDecider counterDecider, String name, double pulsesPerKWh) {
+        this.counterDecider = counterDecider;
+        this.name = name;
+        usageCalculator = new UsageCalculator(pulsesPerKWh);
+    }
+
     public void pulse(Instant pulseTime) {
         if (lastPulse != null) {
             long millisSinceLastPulse = lastPulse.until(pulseTime, ChronoUnit.MILLIS);
-            if (millisSinceLastPulse < 200) {
+            double secondsSinceLast = (double) millisSinceLastPulse / 1_000d;
+            if (usageCalculator.getUsage(secondsSinceLast) > 10_000) {
                 log.warn("Time since last pulse too short ({} ms), dropping current impulse", millisSinceLastPulse);
                 return;
             }
-            secondsBetweenLastPulses = (double) millisSinceLastPulse / 1_000d;
+            secondsBetweenLastPulses = secondsSinceLast;
         }
         lastPulse = pulseTime;
         totalPulses++;
 
         LocalDateTime localDateTime = LocalDateTime.ofInstant(pulseTime, ZoneId.systemDefault());
         counterDecider.findValid(counters.values(), localDateTime)
-                .ifPresent(c -> c.increase(1d / pulsesPerKWh));
+                .ifPresent(c -> c.increase(usageCalculator.usagePerPulseKWh()));
     }
 
     // in watts
     @SuppressWarnings("unused")
     public int getCurrentUsage() {
-        double result = 0;
-        if (secondsBetweenLastPulses != 0) {
-            double pulsesPerSecond = 1.0d / secondsBetweenLastPulses;
-            double pulsesPerHour = SECONDS_PER_HOUR * pulsesPerSecond;
-            result = 1000 * pulsesPerHour / pulsesPerKWh;
-        }
-        return (int) result;
+        return usageCalculator.getUsage(secondsBetweenLastPulses);
     }
 
     @SuppressWarnings("unused")
     public double getTotalUsage() {
-        return round((double) totalPulses / pulsesPerKWh, 3);
+        return round(usageCalculator.getTotalUsageKWh(totalPulses), 3);
     }
 
     public void setCounters(List<EnergyCounter> newCounters) {
