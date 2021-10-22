@@ -20,6 +20,7 @@ sensors:
     guid: dbfb786d-3167-439e-9481-db3ada3a9109
     counters:
       - name: main
+      - name: direct
   - name: Heizstrom
     pulses-per-kwh: 500
     guid: ef974bc8-e7f2-4037-8e4b-9f5ee0f063d0
@@ -27,6 +28,7 @@ sensors:
       - name: T1
         type: day
       - name: T2
+        type: night
 
 times:
   summer:

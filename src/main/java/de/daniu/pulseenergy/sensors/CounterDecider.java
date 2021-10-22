@@ -1,5 +1,6 @@
 package de.daniu.pulseenergy.sensors;
 
+import de.daniu.pulseenergy.domain.CounterType;
 import de.daniu.pulseenergy.domain.EnergyCounter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Optional;
+import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
@@ -19,14 +20,24 @@ public class CounterDecider {
     private final SummerDecider summerDecider;
     private final TimeConfigurationProperties timeConfiguration;
 
-    public Optional<EnergyCounter> findValid(Collection<EnergyCounter> counters, LocalDateTime now) {
+    public Stream<EnergyCounter> findValid(Collection<EnergyCounter> counters, LocalDateTime now) {
         TimeRange dayRange = summerDecider.isSummer(now.toLocalDate())
                 ? timeConfiguration.getSummer().getDay()
                 : timeConfiguration.getWinter().getDay();
         boolean isDay = dayRange.inRange(now);
         return counters.stream()
-                .filter(c -> c.isDayCounter() == isDay)
-                .findFirst();
+                .filter(c -> matchingType(isDay, c.getType()));
+    }
+
+    private static boolean matchingType(boolean isDay, CounterType type) {
+        switch (type) {
+            case day:
+                return isDay;
+            case night:
+                return !isDay;
+            case always:
+        }
+        return true;
     }
 }
 
@@ -34,6 +45,7 @@ public class CounterDecider {
 @RequiredArgsConstructor
 class SummerDecider {
     private final TimeConfigurationProperties timeConfiguration;
+
     boolean isSummer(LocalDate now) {
         boolean result = false;
         LocalDate summerStart = timeConfiguration.getSummer().getStart().forYear(now.getYear());

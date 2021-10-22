@@ -24,8 +24,6 @@ class UsageCalculatorTest {
         LocalTime secondPulse = LocalTime.of(13, 0, 30);
         long millis = firstPulse.until(secondPulse, ChronoUnit.MILLIS);
 
-//        assertThat(millis).isEqualTo(500);
-//        assertThat(sut.usagePerPulseKWh()).isEqualTo(1d/60d);
         assertThat(sut.getUsage(millis)).isEqualTo(2_000);
     }
 }

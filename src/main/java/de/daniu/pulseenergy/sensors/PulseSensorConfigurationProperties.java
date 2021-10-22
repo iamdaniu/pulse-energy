@@ -1,11 +1,13 @@
 package de.daniu.pulseenergy.sensors;
 
+import de.daniu.pulseenergy.domain.CounterType;
 import de.daniu.pulseenergy.domain.EnergyCounter;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Data
 @Component
@@ -28,6 +30,9 @@ class EnergyCounterConfigurationProperties {
     private String type;
 
     EnergyCounter create() {
-        return new EnergyCounter(name, "day".equals(type));
+        CounterType counterType = Optional.ofNullable(type)
+                .map(CounterType::valueOf)
+                .orElse(CounterType.always);
+        return new EnergyCounter(name, counterType);
     }
 }

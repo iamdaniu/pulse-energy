@@ -51,7 +51,7 @@ public class PulseSensor {
 
         LocalDateTime localDateTime = LocalDateTime.ofInstant(pulseTime, ZoneId.systemDefault());
         counterDecider.findValid(counters.values(), localDateTime)
-                .ifPresent(c -> c.increase(usageCalculator.usagePerPulseKWh()));
+                .forEach(c -> c.increase(usageCalculator.usagePerPulseKWh()));
     }
 
     // in watts

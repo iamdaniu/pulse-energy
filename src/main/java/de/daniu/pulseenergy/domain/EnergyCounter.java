@@ -9,17 +9,17 @@ public class EnergyCounter {
     private String name;
 
     @Getter
-    private final boolean dayCounter;
+    private final CounterType type;
 
     @Setter
     private double reading;
 
     EnergyCounter(String main) {
-        this(main, true);
+        this(main, CounterType.always);
     }
-    public EnergyCounter(String name, boolean dayCounter) {
+    public EnergyCounter(String name, CounterType type) {
         this.name = name;
-        this.dayCounter = dayCounter;
+        this.type = type;
         reading = 0;
     }
 
